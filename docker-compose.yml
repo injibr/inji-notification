@@ -4,7 +4,7 @@ services:
   notification-service:
     build: .
     ports:
-      - "8086:8081"
+      - "8082:8082"
     environment:
       - SPRING_PROFILES_ACTIVE=default
     volumes:
