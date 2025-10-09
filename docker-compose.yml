@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  notification-service:
+    build: .
+    ports:
+      - "8086:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+    volumes:
+      - /home/ubuntu/service_account.json:/app/service_account.json:ro
