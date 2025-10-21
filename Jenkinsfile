@@ -1,0 +1,3 @@
+automata {
+    build.coverageTool = 'NONE'
+}
