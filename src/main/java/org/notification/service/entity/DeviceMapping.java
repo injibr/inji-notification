@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "devicemapping")
+@Table(name = "device_mapping")
 public class DeviceMapping {
     @Id
     private String cpfNumber;
