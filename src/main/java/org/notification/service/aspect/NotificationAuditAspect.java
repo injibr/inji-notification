@@ -3,6 +3,7 @@ package org.notification.service.aspect;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.notification.service.config.AuditConfig;
 import org.notification.service.dto.NotifyRequest;
 import org.notification.service.entity.NotificationAudit;
 import org.notification.service.repository.NotificationAuditRepository;
@@ -20,12 +21,18 @@ import java.util.UUID;
 public class NotificationAuditAspect {
     @Autowired
     private NotificationAuditRepository auditRepository;
+    @Autowired
+    private AuditConfig auditConfig;
     private static final Logger logger = LoggerFactory.getLogger(NotificationAuditAspect.class);
 
     @Around(
             "execution(* org.notification.service.controller.NotifyController.notify(..)) && args(bankId, bankSecret, request)"
     )
-    public void auditNotifyRequest(ProceedingJoinPoint pjp, String bankId, String bankSecret, NotifyRequest request) throws Throwable {
+    public Object auditNotifyRequest(ProceedingJoinPoint pjp, String bankId, String bankSecret, NotifyRequest request) throws Throwable {
+        // 🔥 If audit disabled → skip everything
+        if (!auditConfig.isAuditEnabled()) {
+            return pjp.proceed();
+        }
         NotificationAudit audit = new NotificationAudit();
         audit.setIssuedBy(request.getCpfNumber());
         audit.setCreatedTime(LocalDateTime.now());
@@ -60,5 +67,6 @@ public class NotificationAuditAspect {
         audit.setIssuedTime(LocalDateTime.now());
         logger.info("Added audit logs for correlationId {}: and requestId {}:", correlationId, audit.getRequestId());
         auditRepository.save(audit);
+        return response;
     }
 }
