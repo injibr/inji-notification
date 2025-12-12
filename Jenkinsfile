@@ -11,7 +11,7 @@ automata {
 
     containers.add descriptor: 'Dockerfile', imageName: 'inji/inji-notification'
 
-    artifacts.add file: 'target/notification-service-${version}-SNAPSHOT.jar'
+    artifacts.add file: 'target/notification-service-${version}.jar'
 
     build.opts = "-Dgpg.skip=true -Dmaven.javadoc.skip=true"
 
