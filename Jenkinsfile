@@ -14,5 +14,6 @@ automata {
     artifacts.add file: 'target/notification-service-${version}.jar'
 
     build.opts = "-Dgpg.skip=true -Dmaven.javadoc.skip=true"
+    build.coverageTool = 'NONE'
 
 }
