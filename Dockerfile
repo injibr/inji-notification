@@ -5,7 +5,7 @@ FROM eclipse-temurin:21-jdk-alpine
 WORKDIR /app
 
 # Copy the built jar file
-COPY target/notification-service-1.0.jar app.jar
+COPY target/notification-service-*.jar app.jar
 
 # Expose the application port
 EXPOSE 8086
