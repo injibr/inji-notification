@@ -121,9 +121,10 @@ function ler_entrada_tag() {
         fi
     fi
     
-    VERSION=$(echo "$TAG" | sed 's/v//')
+    VERSION=$(echo "$TAG" | sed 's/^v//' | awk -F. '{ if (NF==1) print $1".0.0"; else if (NF==2) print $1"."$2".0"; else print $1"."$2"."$3 }')
     escrever_log "Tag selecionada: $TAG (versão: $VERSION)"
     escrever_mensagem "Versão confirmada: $TAG"
+    escrever_mensagem "Tag selecionada: $TAG (versão: $VERSION)"
 }
 
 function configurar_credenciais_ldap() {
@@ -160,6 +161,79 @@ function configurar_credenciais_ldap() {
     #set_proxy
 }
 
+update_pom_version() {
+  pom_path="$1"
+  new_version="$2"
+  mode="$3"   # project | parent_project
+
+  if [ -z "$pom_path" ] || [ -z "$new_version" ] || [ -z "$mode" ]; then
+    echo "Uso: update_pom_version <caminho_relativo_pom.xml> <nova_versao> <project|parent_project>"
+    return 1
+  fi
+
+  case "$pom_path" in
+    /*)
+      echo "Erro: o caminho do pom.xml deve ser relativo"
+      return 1
+      ;;
+  esac
+
+  if [ ! -f "$pom_path" ]; then
+    echo "Erro: arquivo não encontrado: $pom_path"
+    return 1
+  fi
+
+  awk -v new_version="$new_version" -v mode="$mode" '
+    BEGIN {
+      in_parent = 0
+      parent_updated = 0
+      project_updated = 0
+    }
+
+    # ---- PARENT ----
+    /<parent>/ {
+      in_parent = 1
+      print
+      next
+    }
+
+    in_parent && /<version>/ && !parent_updated {
+      if (mode == "parent_project") {
+        sub(/<version>[^<]*<\/version>/,
+            "<version>" new_version "</version>")
+        parent_updated = 1
+      }
+      print
+      next
+    }
+
+    /<\/parent>/ {
+      in_parent = 0
+      print
+      next
+    }
+
+    # ---- PROJECT ----
+    !in_parent && !project_updated && /<artifactId>/ {
+      print
+      getline
+      if ($0 ~ /<version>/) {
+        if (mode == "project" || mode == "parent_project") {
+          sub(/<version>[^<]*<\/version>/,
+              "<version>" new_version "</version>")
+          project_updated = 1
+        }
+      }
+      print
+      next
+    }
+
+    { print }
+  ' "$pom_path" > "$pom_path.tmp" && mv "$pom_path.tmp" "$pom_path"
+
+  echo "Atualização $pom_path concluída (modo: $mode)"
+}
+
 function baixar_codigo() {
     testar_repositorio_github
     escrever_mensagem "Atualizando código para nova versão $TAG..."
@@ -168,7 +242,9 @@ function baixar_codigo() {
     git fetch github --tags
     # Capturar saída completa do comando git pull
     resultado_pull=$(git merge --allow-unrelated-histories -X theirs $TAG 2>&1)
-
+    
+    #Atualiza o pom de acordo com a versão passada via tag
+    update_pom_version ./pom.xml $VERSION project
 
     if [ $? -ne 0 ]; then
         mensagem_erro="Falha ao baixar o código da versão $TAG."
@@ -381,5 +457,8 @@ function principal() {
     finalizar_relatorio
 }
 
-# Iniciar execução do script
 principal
+
+
+
+
