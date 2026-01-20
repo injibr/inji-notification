@@ -5,19 +5,12 @@
 TAG_PREDEFINIDA="v0.10.2"  # Defina a tag diretamente aqui
 COMPONENTE=inji-notification  #componente inji a ser tratado no script
 
-# !!! IMPORTANTE O primeiro push por padrão tem o MANAGE_GITIGNORE=false para baixar o git_ignore sem conflitos do repositorio original github. 
-MANAGE_GITIGNORE=false     #Caso TRUE, adiciona o update_script e relatorios na lista do gitignore.
-# A execução via terminal solicita os dados LDAP, caso queira fixar suas credenciais nas variaveis abaixo,
-# desabilite a solicitação via terminal com a variavel INPUT_LDAP_CREDENTIAL=false e altere o MANAGE_GITIGNORE=true a partir da 2 atualização 
-# para que o script não seja comitado.
-
-INPUT_LDAP_CREDENTIAL=true
 LDAP_USER="USER"  # Substitua pelo seu usuário
 LDAP_PASSWORD="PASS"  # Substitua pela sua senha
 
-#####f
+####################
 
-USAR_TAG_PREDEFINIDA=true   # Defina como true para usar a tag predefinida ou false para solicitar ao usuário
+USAR_TAG_PREDEFINIDA=false   # Defina como true para usar a tag predefinida ou false para solicitar ao usuário
 TAG=""
 VERSION=""
 ID_COMMIT_PULL=""
@@ -86,7 +79,7 @@ function testar_repositorio_github() {
             escrever_log "Conexão estabelecida com URL alternativa."
         else
             escrever_mensagem "Falha persistente na conexão. Verifique sua rede e configurações de proxy."
-            escrever_log "[ERRO CRÍTICO] Falha persistente na conexão com GitHub após tentativas alternativas."
+            escrever_log "[ERRO CRÍTICO] Falha persiTAG_PREDEFINIDAstente na conexão com GitHub após tentativas alternativas."
             exit 1
         fi
     fi
@@ -164,17 +157,7 @@ function configurar_credenciais_ldap() {
     escrever_log "Credenciais LDAP carregadas (usuário: $LDAP_USER)"
     
     # Configurar proxy
-    set_proxy
-}
-
-function set_proxy() {
-    export http_proxy="http://${LDAP_USER}:${LDAP_PASSWORD}@10.70.124.16:3128" && export https_proxy="http://${LDAP_USER}:${LDAP_PASSWORD}@10.70.124.16:3128"
-    
-}
-
-function unset_proxy() {
-    export http_proxy= && export https_proxy=
-   
+    #set_proxy
 }
 
 function baixar_codigo() {
@@ -182,13 +165,9 @@ function baixar_codigo() {
     escrever_mensagem "Atualizando código para nova versão $TAG..."
     escrever_log "Iniciando download do código versão $TAG"
     
-    #git fetch github tag $TAG
+    git fetch github --tags
     # Capturar saída completa do comando git pull
-    #resultado_pull=$(git merge --allow-unrelated-histories -X theirs tags/$TAG 2>&1)
-   
-    git fetch github
-    git merge --allow-unrelated-histories -X theirs github/$TAG
-
+    resultado_pull=$(git merge --allow-unrelated-histories -X theirs $TAG 2>&1)
 
 
     if [ $? -ne 0 ]; then
@@ -233,7 +212,7 @@ function nova_tag_git() {
     fi
 }
 
-function enviar_codigo() {
+function commit_codigo() {
     escrever_mensagem "Fazendo commit do código ..."
     escrever_log "Iniciando commit dos arquivos"
     
@@ -251,11 +230,11 @@ function enviar_codigo() {
     # Realizar o commit
     git commit -m "Atualizando arquivos para versão $TAG"
     #Tag ja baixada junto com o codigo
-    #nova_tag_git
+    nova_tag_git
 }
 
-function enviar_scm() {
-    unset_proxy
+function push_scm() {
+    #unset_proxy
     escrever_mensagem "Enviando alterações para SCM ..."
     escrever_log "Iniciando push para SCM"
     # Alterar nome da branch para a correta
@@ -288,10 +267,10 @@ function enviar_scm() {
 }
 
 function enviar_versao_para_ic() {
-    # atualizar_arquivos_propriedades
+    
     baixar_codigo
-    enviar_codigo
-    #enviar_scm
+    commit_codigo
+    push_scm
 }
 
 function atualizar_arquivos_propriedades() {
@@ -381,15 +360,13 @@ function principal() {
         escrever_mensagem "Pasta de relatórios criada: $PASTA_RELATORIOS"
     fi
     
-    if [ "$INPUT_LDAP_CREDENTIAL" = "true" ]; then
-        solicitar_ldap
-    fi
+    #Necessario para gerenciamento do git
+    solicitar_ldap
+    
+    #if [ "$MANAGE_GITIGNORE" = "true" ]; then
+    #    criar_gitignore
+    #fi
 
-    
-    
-    if [ "$MANAGE_GITIGNORE" = "true" ]; then
-        criar_gitignore
-    fi
     inicializar_relatorio
     escrever_log "Iniciando execução do script de atualização"
     
