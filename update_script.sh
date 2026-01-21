@@ -1,15 +1,22 @@
 #!/bin/bash
 
+# Script: update_script.sh
+# Versão: 1.0.0
+# Descrição: Esse script executa download do repositorio externo github através de tag passada via terminal, 
+# atualiza os arquivos pom.xml baseado na tag (ex: v4.0 => 4.0.0), efetua commit local e faz push no repositorio scm na branch atual.
+# Autor: Alexandre Dekker
+# Data: 2026-01-21
+
 # Configurações do script
-# Parametros principais
-TAG_PREDEFINIDA="v0.10.2"  # Defina a tag diretamente aqui
+# Parametros necessários
+
 COMPONENTE=inji-notification  #componente inji a ser tratado no script
+
+
+################################################################################################################################################################
 
 LDAP_USER="USER"  # Substitua pelo seu usuário
 LDAP_PASSWORD="PASS"  # Substitua pela sua senha
-
-####################
-
 USAR_TAG_PREDEFINIDA=false   # Defina como true para usar a tag predefinida ou false para solicitar ao usuário
 TAG=""
 VERSION=""
@@ -79,7 +86,7 @@ function testar_repositorio_github() {
             escrever_log "Conexão estabelecida com URL alternativa."
         else
             escrever_mensagem "Falha persistente na conexão. Verifique sua rede e configurações de proxy."
-            escrever_log "[ERRO CRÍTICO] Falha persiTAG_PREDEFINIDAstente na conexão com GitHub após tentativas alternativas."
+            escrever_log "[ERRO CRÍTICO] Falha persistente na conexão com GitHub após tentativas alternativas."
             exit 1
         fi
     fi
