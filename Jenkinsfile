@@ -12,7 +12,7 @@ automata {
         //prd: 'gitops-p/fth-ap2145-jano/ctn-121',
     ]
 
-    containers.add descriptor: 'Dockerfile', imageName: 'inji/inji-notification', tagKey='injiNotification.image.tag'
+    containers.add descriptor: 'Dockerfile', imageName: 'inji/inji-notification', tagKey:'injiNotification.image.tag'
 
     artifacts.add file: 'target/notification-service-${version}.jar'
 
