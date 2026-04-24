@@ -18,4 +18,6 @@ automata {
 
     build.opts = "-Dgpg.skip=true -Dmaven.javadoc.skip=true"
 
+    build.coverageTool = 'NONE'
+
 }
