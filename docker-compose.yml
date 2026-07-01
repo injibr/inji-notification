@@ -24,9 +24,4 @@ services:
       SERVER_PORT: 8082
       SPRING_PROFILES_ACTIVE: default
 
-      FIREBASE_SERVICE_ACCOUNT_PATH: /app/service_account.json
-
-    volumes:
-      - /home/ubuntu/service_account.json:/app/service_account.json:ro
-
     restart: always
