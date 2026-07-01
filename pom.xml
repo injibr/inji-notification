@@ -43,8 +43,9 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-logging</artifactId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
+
     </dependencies>
 
     <build>
