@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.UUID;
 
 @Aspect
@@ -34,15 +33,12 @@ public class NotificationAuditAspect {
             return pjp.proceed();
         }
         NotificationAudit audit = new NotificationAudit();
-        audit.setIssuedBy(request.getCpfNumber());
+        audit.setIssuedBy(request.getCpf());
         audit.setCreatedTime(LocalDateTime.now());
         String correlationId = UUID.randomUUID() + "-" + System.currentTimeMillis();
         audit.setCorrelationId(correlationId);
 
-        String verificationLink = null;
-        if (request.getRequest() != null && request.getRequest().get("data") != null) {
-            verificationLink = ((HashMap<String, String>) request.getRequest().get("data")).get("verificationLink");
-        }
+        String verificationLink = request.getAuthorizationRequest();
         if (verificationLink != null) {
             VerificationLinkInfo info = VerificationLinkDecoder.decode(verificationLink);
             audit.setRequestId(info.getRequestId());
