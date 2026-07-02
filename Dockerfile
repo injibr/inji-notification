@@ -1,5 +1,6 @@
 # Use Eclipse Temurin OpenJDK 21 as base image
-FROM eclipse-temurin:21-jdk-alpine
+#FROM eclipse-temurin:21-jdk-alpine
+FROM registry-ctn.prevnet/library/eclipse-temurin:21-jre
 
 # Set working directory
 WORKDIR /app
