@@ -57,10 +57,15 @@
     </dependencies>
     <dependencyManagement>
         <dependencies>
-            <!-- Override config-client version to fix CVE-2026-40982, CVE-2026-41002, CVE-2026-40981 -->
+            <!-- Override config versions to fix CVE-2026-40982, CVE-2026-41002, CVE-2026-40981 -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-config-client</artifactId>
+                <version>4.3.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-config</artifactId>
                 <version>4.3.4</version>
             </dependency>
             <dependency>
