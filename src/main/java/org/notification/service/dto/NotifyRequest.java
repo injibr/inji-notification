@@ -3,32 +3,31 @@ package org.notification.service.dto;
 import java.util.Map;
 
 public class NotifyRequest {
-    private String bankId;
-    private String cpf;
-    private String requestId;
-    private String transactionId;
-    private String authorizationRequest;
-    private String notificationType;
-    private String priority;
-    private String titulo;
-    private String corpoDaMensagem;
+    private String cpfNumber;
+    private Request request;
 
-    public String getBankId() { return bankId; }
-    public void setBankId(String bankId) { this.bankId = bankId; }
-    public String getCpf() { return cpf; }
-    public void setCpf(String cpf) { this.cpf = cpf; }
-    public String getRequestId() { return requestId; }
-    public void setRequestId(String requestId) { this.requestId = requestId; }
-    public String getTransactionId() { return transactionId; }
-    public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
-    public String getAuthorizationRequest() { return authorizationRequest; }
-    public void setAuthorizationRequest(String authorizationRequest) { this.authorizationRequest = authorizationRequest; }
-    public String getNotificationType() { return notificationType; }
-    public void setNotificationType(String notificationType) { this.notificationType = notificationType; }
-    public String getPriority() { return priority; }
-    public void setPriority(String priority) { this.priority = priority; }
-    public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
-    public String getCorpoDaMensagem() { return corpoDaMensagem; }
-    public void setCorpoDaMensagem(String corpoDaMensagem) { this.corpoDaMensagem = corpoDaMensagem; }
+    public String getCpfNumber() { return cpfNumber; }
+    public void setCpfNumber(String cpfNumber) { this.cpfNumber = cpfNumber; }
+    public Request getRequest() { return request; }
+    public void setRequest(Request request) { this.request = request; }
+
+    public static class Request {
+        private Notification notification;
+        private Map<String, String> data;
+
+        public Notification getNotification() { return notification; }
+        public void setNotification(Notification notification) { this.notification = notification; }
+        public Map<String, String> getData() { return data; }
+        public void setData(Map<String, String> data) { this.data = data; }
+    }
+
+    public static class Notification {
+        private String title;
+        private String body;
+
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+        public String getBody() { return body; }
+        public void setBody(String body) { this.body = body; }
+    }
 }

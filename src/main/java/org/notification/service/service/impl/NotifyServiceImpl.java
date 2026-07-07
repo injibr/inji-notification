@@ -12,14 +12,13 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class NotifyServiceImpl implements NotifyService {
 
     private static final Logger logger = LoggerFactory.getLogger(NotifyServiceImpl.class);
 
-    private static final String DEFAULT_TITULO = "Solicitação de Verificação";
-    private static final String DEFAULT_CORPO = "Você possui uma nova solicitação de verificação de credenciais.";
     private static final String TIPO_FONTE = "INJI";
     private static final String ACAO = "SOLICITACAO_VCS";
 
@@ -30,43 +29,43 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     @Override
-    public void notify(NotifyRequest request) {
-        if (request.getCpf() == null) {
-            logger.warn("cpf missing in NotifyRequest");
-            throw new IllegalArgumentException("cpf is required");
+    public void notify(NotifyRequest request, String bankId) {
+        if (request.getCpfNumber() == null) {
+            throw new IllegalArgumentException("cpfNumber is required");
         }
 
-        String titulo = request.getTitulo() != null ? request.getTitulo() : DEFAULT_TITULO;
-        String corpo = request.getCorpoDaMensagem() != null ? request.getCorpoDaMensagem() : DEFAULT_CORPO;
+        String titulo = request.getRequest() != null && request.getRequest().getNotification() != null
+                ? request.getRequest().getNotification().getTitle() : "Solicitação de Verificação";
+        String corpo = request.getRequest() != null && request.getRequest().getNotification() != null
+                ? request.getRequest().getNotification().getBody() : "Você possui uma nova solicitação de verificação de credenciais.";
+
+        String authorizationRequest = null;
+        if (request.getRequest() != null && request.getRequest().getData() != null) {
+            authorizationRequest = request.getRequest().getData().get("verificationLink");
+        }
 
         Map<String, Object> dados = new HashMap<>();
-        dados.put("bankId", request.getBankId());
-        dados.put("requestId", request.getRequestId());
-        dados.put("transactionId", request.getTransactionId());
-        dados.put("authorizationRequest", request.getAuthorizationRequest());
-        dados.put("notificationType", request.getNotificationType());
-        dados.put("priority", request.getPriority());
+        dados.put("bankId", bankId != null && !bankId.isBlank() ? bankId : "unknown_bank");
+        dados.put("requestId", UUID.randomUUID().toString());
+        dados.put("transactionId", bankId + "_txn_" + System.currentTimeMillis());
+        dados.put("authorizationRequest", authorizationRequest);
+        dados.put("notificationType", "VP_REQUEST");
+        dados.put("priority", "high");
 
         MirNotificationRequest mirRequest = new MirNotificationRequest(
-                titulo,
-                corpo,
-                List.of(request.getCpf()),
-                TIPO_FONTE,
-                ACAO,
-                dados,
-                true
+                titulo, corpo, List.of(request.getCpfNumber()), TIPO_FONTE, ACAO, dados, true
         );
 
         try {
             wso2Client.sendNotification(mirRequest);
         } catch (NotificationSendException e) {
-            logger.error("Error sending notification for CPF {}: {}", request.getCpf(), e.getMessage(), e);
+            logger.error("Error sending notification for CPF {}: {}", request.getCpfNumber(), e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            logger.error("Unexpected error sending notification for CPF {}: {}", request.getCpf(), e.getMessage(), e);
+            logger.error("Unexpected error sending notification for CPF {}: {}", request.getCpfNumber(), e.getMessage(), e);
             throw new NotificationSendException("Unexpected error: " + e.getMessage(), e);
         }
 
-        logger.info("Notification sent for CPF: {}", request.getCpf());
+        logger.info("Notification sent for CPF: {}", request.getCpfNumber());
     }
 }
