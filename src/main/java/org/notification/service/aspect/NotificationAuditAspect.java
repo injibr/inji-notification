@@ -33,12 +33,13 @@ public class NotificationAuditAspect {
             return pjp.proceed();
         }
         NotificationAudit audit = new NotificationAudit();
-        audit.setIssuedBy(request.getCpf());
+        audit.setIssuedBy(request.getCpfNumber());
         audit.setCreatedTime(LocalDateTime.now());
         String correlationId = UUID.randomUUID() + "-" + System.currentTimeMillis();
         audit.setCorrelationId(correlationId);
 
-        String verificationLink = request.getAuthorizationRequest();
+        String verificationLink = (request.getRequest() != null && request.getRequest().getData() != null)
+                ? request.getRequest().getData().get("verificationLink") : null;
         if (verificationLink != null) {
             VerificationLinkInfo info = VerificationLinkDecoder.decode(verificationLink);
             audit.setRequestId(info.getRequestId());

@@ -32,7 +32,7 @@ public class NotifyController {
             logger.warn("Unauthorized: Invalid bankId or bankSecret");
             return ResponseEntity.status(401).body(new ErrorResponse("Unauthorized", "Invalid bankId or bankSecret"));
         }
-        notifyService.notify(request);
+        notifyService.notify(request, bankId);
         return ResponseEntity.ok().body(new SuccessResponse("Notification Sent"));
     }
 
