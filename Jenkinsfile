@@ -1,6 +1,6 @@
 automata {
 
-    skipHom = true
+    //skipHom = true
 
     build.agent.image = 'library/maven:3.9-eclipse-temurin-21'
 
