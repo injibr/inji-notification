@@ -8,8 +8,8 @@ automata {
     gitOps.engine = 'HELM'
     gitOps.repos = [
         dev: 'gitops-np/credenciais-verificaveis',
-        hml: 'gitops-np/credenciais-verificaveis',
-        //prd: 'gitops-p/credenciais-verificaveis',
+        hom: 'gitops-np/credenciais-verificaveis',
+        prd: 'gitops-p/credenciais-verificaveis',
     ]
 
     containers.add descriptor: 'Dockerfile', imageName: 'inji/inji-notification', tagKey:'injiNotification.image.tag'
